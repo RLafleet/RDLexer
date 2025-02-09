@@ -24,6 +24,9 @@ $tests = [
     ['expression' => ')', 'expected' => null],
 ];
 
+// TODO need to do the pascal code processing.
+// TODO need to do the function processing. EXAMPLE fn()
+
 foreach ($tests as $test) {
     $expression = $test['expression'];
     $expected = $test['expected'];
