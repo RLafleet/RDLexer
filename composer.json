@@ -1,0 +1,11 @@
+{
+    "name": "maxim/rd-lexer",
+    "autoload": {
+        "psr-4": {
+            "Maxim\\RdLexer\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.1.0"
+    }
+}
