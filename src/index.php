@@ -32,7 +32,8 @@ $tests = [
     ['expression' => '2+2; end;', 'expected' => null],
 ];
 
-// TODO L_2 need to do the function processing. EXAMPLE fn()
+// TODO L_2 добавить обработку функций. Пример: fn(a) - ок.   fn() - зависит от реализации, может быть как ошибкой так и ок
+// TODO L_11 вынести тесты отдельно и накадить ещё тестов
 
 foreach ($tests as $test) {
     $expression = $test['expression'];
