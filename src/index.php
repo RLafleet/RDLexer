@@ -12,10 +12,7 @@ class Token {
     }
 }
 
-class ExpressionCalc {
-    private $stream;
-    private $token;
-
+class Lexer {
     const WS = 'ws';
     const NUMBER = 'num';
     const PLUS = 'plus';
@@ -43,65 +40,73 @@ class ExpressionCalc {
         ['type' => self::END_OF_FILE, 're' => '/^$/']
     ];
 
+    private $input;
+    private $pos;
+
     public function __construct($input) {
-        $this->stream = $this->tokenize($input);
-        $this->next();
+        $this->input = $input;
+        $this->pos = 0;
     }
 
-    private function tokenize($input) {
-        $pos = 0;
-        $unknownFrom = -1;
+    public function tokenize() {
         $tokens = [];
+        $unknownFrom = -1;
 
-        while ($input) {
-            $posBefore = $pos;
+        while ($this->pos < strlen($this->input)) {
+            $posBefore = $this->pos;
+            $matched = false;
+
             foreach (self::$matchers as $matcher) {
                 $type = $matcher['type'];
                 $re = $matcher['re'];
-                if (preg_match($re, substr($input, $pos), $matches)) {
+                if (preg_match($re, substr($this->input, $this->pos), $matches)) {
                     $match = $matches[0];
                     if ($unknownFrom >= 0) {
-                        $tokens[] = new Token(self::UNKNOWN, $unknownFrom, substr($input, $unknownFrom, $pos));
+                        $tokens[] = new Token(self::UNKNOWN, $unknownFrom, substr($this->input, $unknownFrom, $this->pos - $unknownFrom));
                         $unknownFrom = -1;
                     }
-                    $tokens[] = new Token($type, $pos, $match);
-                    if ($type === self::END_OF_FILE) {
-                        $input = null;
-                    }
-                    $pos += strlen($match);
+                    $tokens[] = new Token($type, $this->pos, $match);
+                    $this->pos += strlen($match);
+                    $matched = true;
                     break;
                 }
             }
-            if ($input && $posBefore === $pos) {
+
+            if (!$matched) {
                 if ($unknownFrom < 0) {
-                    $unknownFrom = $pos;
+                    $unknownFrom = $this->pos;
                 }
-                $pos++;
+                $this->pos++;
             }
         }
 
+        $tokens[] = new Token(self::END_OF_FILE, $this->pos);
         return $tokens;
     }
+}
 
-    public function calc() {
-        $result = $this->expression();
-        $this->expect(self::END_OF_FILE);
-        return $result;
+class Parser {
+    private $tokens;
+    private $currentToken;
+
+    public function __construct($tokens) {
+        $this->tokens = $tokens;
+        $this->currentToken = array_shift($this->tokens);
     }
 
     private function error($err) {
-        throw new Exception("$err, pos={$this->token->pos}, token={$this->token->match}, type={$this->token->type}");
+        throw new Exception("$err, pos={$this->currentToken->pos}, token={$this->currentToken->match}, type={$this->currentToken->type}");
     }
 
     private function next() {
         do {
-            $this->token = array_shift($this->stream);
-        } while ($this->token && $this->token->type === self::WS);
+            $this->currentToken = array_shift($this->tokens);
+        } while ($this->currentToken && $this->currentToken->type === Lexer::WS);
     }
 
     private function accept($type) {
-        if ($this->token && $this->token->type === $type) {
-            $match = $this->token->match;
+        if ($this->currentToken && $this->currentToken->type === $type) {
+            $match = $this->currentToken->match;
             $this->next();
             return $match ?: true;
         }
@@ -116,16 +121,16 @@ class ExpressionCalc {
         $result = null;
         $text = null;
 
-        if ($this->accept(self::LEFT_PAR)) {
+        if ($this->accept(Lexer::LEFT_PAR)) {
             $result = $this->expression();
-            $this->expect(self::RIGHT_PAR);
-        } elseif ($text = $this->accept(self::NUMBER)) {
+            $this->expect(Lexer::RIGHT_PAR);
+        } elseif ($text = $this->accept(Lexer::NUMBER)) {
             $result = floatval($text);
-        } elseif ($this->accept(self::PLUS)) {
+        } elseif ($this->accept(Lexer::PLUS)) {
             $result = +$this->factor();
-        } elseif ($this->accept(self::MINUS)) {
+        } elseif ($this->accept(Lexer::MINUS)) {
             $result = -$this->factor();
-        } elseif ($text = $this->accept(self::IDENTIFIER)) {
+        } elseif ($text = $this->accept(Lexer::IDENTIFIER)) {
             $text = strtolower($text);
 
             if ($text === 'pi') {
@@ -133,9 +138,9 @@ class ExpressionCalc {
             } elseif ($text === 'e') {
                 $result = exp(1);
             } elseif (function_exists($text)) {
-                $this->expect(self::LEFT_PAR);
+                $this->expect(Lexer::LEFT_PAR);
                 $result = $text($this->expression());
-                $this->expect(self::RIGHT_PAR);
+                $this->expect(Lexer::RIGHT_PAR);
             } else {
                 $this->error("unknown id $text");
             }
@@ -150,11 +155,11 @@ class ExpressionCalc {
         $result = $this->factor();
 
         while (true) {
-            if ($this->accept(self::MULTIPLY)) {
+            if ($this->accept(Lexer::MULTIPLY)) {
                 $result *= $this->term();
-            } elseif ($this->accept(self::DIVIDE)) {
+            } elseif ($this->accept(Lexer::DIVIDE)) {
                 $result /= $this->term();
-            } elseif ($this->accept(self::MOD)) {
+            } elseif ($this->accept(Lexer::MOD)) {
                 $result %= $this->term();
             } else {
                 break;
@@ -168,9 +173,9 @@ class ExpressionCalc {
         $result = $this->term();
 
         while (true) {
-            if ($this->accept(self::PLUS)) {
+            if ($this->accept(Lexer::PLUS)) {
                 $result += $this->term();
-            } elseif ($this->accept(self::MINUS)) {
+            } elseif ($this->accept(Lexer::MINUS)) {
                 $result -= $this->term();
             } else {
                 break;
@@ -178,6 +183,21 @@ class ExpressionCalc {
         }
 
         return $result;
+    }
+
+    public function parse() {
+        $result = $this->expression();
+        $this->expect(Lexer::END_OF_FILE);
+        return $result;
+    }
+}
+
+class ExpressionCalc {
+    public function calc($input) {
+        $lexer = new Lexer($input);
+        $tokens = $lexer->tokenize();
+        $parser = new Parser($tokens);
+        return $parser->parse();
     }
 }
 
@@ -209,7 +229,7 @@ foreach ($tests as $test) {
     $expected = $test['expected'];
 
     try {
-        $result = (new ExpressionCalc($expression))->calc();
+        $result = (new ExpressionCalc())->calc($expression);
         if (is_float($expected) && abs($result - $expected) < 0.000001) {
             echo "Тест пройден для выражения \"$expression\": $result == $expected\n";
         } elseif ($result == $expected) {
