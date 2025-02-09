@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75d348d1-d08b-4b61-bac5-470d6cc72957" name="Changes" comment="" />
+    <list default="true" id="75d348d1-d08b-4b61-bac5-470d6cc72957" name="Changes" comment="addded readme">
+      <change afterPath="$PROJECT_DIR$/src/ExpressionCalc.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Lexer.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Parser.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Token.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +20,12 @@
   <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
@@ -146,6 +159,7 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="2sc9BVX9tNBcUPoZrcqFJ1dDnuc" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -154,6 +168,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
     "last_opened_file_path": "C:/Projects/TAP",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -190,11 +205,42 @@
       <option name="presentableId" value="Default" />
       <updated>1738743866141</updated>
       <workItem from="1738743868068" duration="2972000" />
-      <workItem from="1739124517547" duration="2999000" />
+      <workItem from="1739124517547" duration="4890000" />
     </task>
+    <task id="LOCAL-00001" summary="Remove comments and fix some problems">
+      <option name="closed" value="true" />
+      <created>1739128905594</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1739128905594</updated>
+    </task>
+    <task id="LOCAL-00002" summary="classes">
+      <option name="closed" value="true" />
+      <created>1739129217746</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1739129217746</updated>
+    </task>
+    <task id="LOCAL-00003" summary="addded readme">
+      <option name="closed" value="true" />
+      <created>1739129379018</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1739129379018</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Remove comments and fix some problems" />
+    <MESSAGE value="classes" />
+    <MESSAGE value="addded readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="addded readme" />
   </component>
 </project>
