@@ -1,6 +1,4 @@
 <?php
-// index.php
-
 require_once 'ExpressionCalc.php';
 
 $tests = [
