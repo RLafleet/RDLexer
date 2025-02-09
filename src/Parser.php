@@ -129,7 +129,7 @@ class Parser {
     }
 
     public function parse() {
-
+        // TODO L_2 добавить обработку функций. Пример: fn(a) - ок.   fn() - зависит от реализации, может быть как ошибкой так и ок
         if ($this->accept(Lexer::BEGIN)) {
             return $this->block();
         } else {
