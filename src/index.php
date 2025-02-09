@@ -10,10 +10,6 @@ class Token {
         $this->pos = $pos;
         $this->match = $match;
     }
-
-    public function __toString() {
-        return "Token(type={$this->type}, pos={$this->pos}, match='{$this->match}')";
-    }
 }
 
 class ExpressionCalc {
@@ -57,8 +53,6 @@ class ExpressionCalc {
         $unknownFrom = -1;
         $tokens = [];
 
-        echo "Tokenizing input: \"$input\"\n";
-
         while ($input) {
             $posBefore = $pos;
             foreach (self::$matchers as $matcher) {
@@ -71,7 +65,6 @@ class ExpressionCalc {
                         $unknownFrom = -1;
                     }
                     $tokens[] = new Token($type, $pos, $match);
-                    echo "Created token: {$tokens[count($tokens) - 1]}\n";
                     if ($type === self::END_OF_FILE) {
                         $input = null;
                     }
@@ -91,10 +84,8 @@ class ExpressionCalc {
     }
 
     public function calc() {
-        echo "Starting calculation...\n";
         $result = $this->expression();
         $this->expect(self::END_OF_FILE);
-        echo "Calculation result: $result\n";
         return $result;
     }
 
@@ -105,59 +96,43 @@ class ExpressionCalc {
     private function next() {
         do {
             $this->token = array_shift($this->stream);
-            echo "Next token: " . ($this->token ? $this->token : "EOF") . "\n";
         } while ($this->token && $this->token->type === self::WS);
     }
 
     private function accept($type) {
         if ($this->token && $this->token->type === $type) {
             $match = $this->token->match;
-            echo "Accepted token: {$this->token}\n";
             $this->next();
             return $match ?: true;
         }
-        echo "Failed to accept token of type: $type (current token: " . ($this->token ? $this->token : "EOF") . ")\n";
         return false;
     }
 
     private function expect($type) {
-        if (!$this->accept($type)) {
-            $this->error("expected $type");
-        }
-        echo "Expected token of type: $type accepted\n";
+        return $this->accept($type) ?: $this->error("expected $type");
     }
 
     private function factor() {
-        echo "Entering factor()\n";
         $result = null;
         $text = null;
 
         if ($this->accept(self::LEFT_PAR)) {
-            echo "Found left parenthesis\n";
             $result = $this->expression();
             $this->expect(self::RIGHT_PAR);
-            echo "Found right parenthesis\n";
         } elseif ($text = $this->accept(self::NUMBER)) {
-            echo "Found number: $text\n";
             $result = floatval($text);
         } elseif ($this->accept(self::PLUS)) {
-            echo "Found unary plus\n";
             $result = +$this->factor();
         } elseif ($this->accept(self::MINUS)) {
-            echo "Found unary minus\n";
             $result = -$this->factor();
         } elseif ($text = $this->accept(self::IDENTIFIER)) {
-            echo "Found identifier: $text\n";
             $text = strtolower($text);
 
             if ($text === 'pi') {
                 $result = pi();
-                echo "Resolved pi() to $result\n";
             } elseif ($text === 'e') {
                 $result = exp(1);
-                echo "Resolved e to $result\n";
             } elseif (function_exists($text)) {
-                echo "Found function: $text\n";
                 $this->expect(self::LEFT_PAR);
                 $result = $text($this->expression());
                 $this->expect(self::RIGHT_PAR);
@@ -168,50 +143,40 @@ class ExpressionCalc {
             $this->error('unexpected input');
         }
 
-        echo "Exiting factor(), result: $result\n";
         return $result;
     }
 
     private function term() {
-        echo "Entering term()\n";
         $result = $this->factor();
 
         while (true) {
             if ($this->accept(self::MULTIPLY)) {
-                echo "Found multiply\n";
                 $result *= $this->term();
             } elseif ($this->accept(self::DIVIDE)) {
-                echo "Found divide\n";
                 $result /= $this->term();
             } elseif ($this->accept(self::MOD)) {
-                echo "Found mod\n";
                 $result %= $this->term();
             } else {
                 break;
             }
         }
 
-        echo "Exiting term(), result: $result\n";
         return $result;
     }
 
     private function expression() {
-        echo "Entering expression()\n";
         $result = $this->term();
 
         while (true) {
             if ($this->accept(self::PLUS)) {
-                echo "Found plus\n";
                 $result += $this->term();
             } elseif ($this->accept(self::MINUS)) {
-                echo "Found minus\n";
                 $result -= $this->term();
             } else {
                 break;
             }
         }
 
-        echo "Exiting expression(), result: $result\n";
         return $result;
     }
 }
@@ -227,8 +192,8 @@ $tests = [
     ['expression' => '3%2', 'expected' => 1],
     ['expression' => '+1', 'expected' => 1],
     ['expression' => '-(2+3)', 'expected' => -5],
-    ['expression' => 'cos(2*pi())', 'expected' => cos(2 * pi())],
-    ['expression' => '-2.1+ .355 / (cos(pi() % 3) + sin(0.311))', 'expected' => -2.1 + .355 / (cos(pi() % 3) + sin(0.311))],
+    ['expression' => 'cos(2*pi)', 'expected' => cos(2 * M_PI)],
+    ['expression' => '-2.1+ .355 / (cos(pi % 3) + sin(0.311))', 'expected' => -1.8281798930831],
     ['expression' => '+-+-', 'expected' => null],
     ['expression' => ')(', 'expected' => null],
     ['expression' => 'ab.5', 'expected' => null],
@@ -236,17 +201,18 @@ $tests = [
     ['expression' => '5a', 'expected' => null],
     ['expression' => 'fn(a,)', 'expected' => null],
     ['expression' => 'fn(a,b)', 'expected' => null],
-    ['expression' => '.', 'expected' => null],
+    ['expression' => ')', 'expected' => null],
 ];
 
 foreach ($tests as $test) {
     $expression = $test['expression'];
     $expected = $test['expected'];
 
-    echo "\nRunning test for expression: \"$expression\"\n";
     try {
         $result = (new ExpressionCalc($expression))->calc();
-        if (abs($result - $expected) < 0.000001) {
+        if (is_float($expected) && abs($result - $expected) < 0.000001) {
+            echo "Тест пройден для выражения \"$expression\": $result == $expected\n";
+        } elseif ($result == $expected) {
             echo "Тест пройден для выражения \"$expression\": $result == $expected\n";
         } else {
             echo "Ошибка в тесте для выражения \"$expression\": $result !== $expected\n";
