@@ -14,6 +14,33 @@ class Parser {
         throw new Exception("$err, pos={$this->currentToken->pos}, token={$this->currentToken->match}, type={$this->currentToken->type}");
     }
 
+    private function block() {
+        $result = null;
+        do {
+            // TODO L_3 Добавить вложенности блоков begin...end
+            // TODO L_4 Добавить базовые ключевые слова помимо типа var, write, read
+            // TODO L_5 Добавить базовые операторы типа: :=, if, case
+            // TODO L_6 Реализовать обработку процедур и функций
+            // TODO L_7 Добавить поддержку типов данных (integer, real, boolean, char, string)
+            // TODO L_8 Реализовать обработку циклов (for, while, repeat...until)
+            // TODO L_9 Добавить поддержку массивов и записей
+            // TODO L_10 Добавить поддержку модулей и unit'ов
+            if ($this->currentToken && $this->currentToken->type === Lexer::END) {
+                break;
+            }
+
+            $result = $this->expression();
+            if ($this->accept(Lexer::SEMICOLON)) {
+                continue;
+            } else {
+                break;
+            }
+        } while (true);
+
+        $this->expect(Lexer::END);
+        $this->expect(Lexer::SEMICOLON);
+        return $result;
+    }
     private function next() {
         do {
             $this->currentToken = array_shift($this->tokens);
@@ -102,8 +129,13 @@ class Parser {
     }
 
     public function parse() {
-        $result = $this->expression();
-        $this->expect(Lexer::END_OF_FILE);
-        return $result;
+
+        if ($this->accept(Lexer::BEGIN)) {
+            return $this->block();
+        } else {
+            $result = $this->expression();
+            $this->expect(Lexer::END_OF_FILE);
+            return $result;
+        }
     }
 }

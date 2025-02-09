@@ -22,9 +22,16 @@ $tests = [
     ['expression' => 'fn(a,)', 'expected' => null],
     ['expression' => 'fn(a,b)', 'expected' => null],
     ['expression' => ')', 'expected' => null],
+    ['expression' => 'begin 2+2; end;', 'expected' => 4],
+    ['expression' => 'begin 2+3-4; end;', 'expected' => 1],
+    ['expression' => 'begin (2+2)*2; end;', 'expected' => 8],
+    ['expression' => 'begin 2+2; 3+3; end;', 'expected' => 6], // Если что, возращает последний результат
+    ['expression' => 'begin end;', 'expected' => null],
+    ['expression' => 'begin 2+2 end;', 'expected' => null],
+    ['expression' => 'begin 2+2;', 'expected' => null],
+    ['expression' => '2+2; end;', 'expected' => null],
 ];
 
-// TODO L_1 need to do the pascal code processing.
 // TODO L_2 need to do the function processing. EXAMPLE fn()
 
 foreach ($tests as $test) {

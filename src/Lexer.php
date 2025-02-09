@@ -15,6 +15,9 @@ class Lexer {
     const IDENTIFIER = 'id';
     const UNKNOWN = 'unknown';
     const END_OF_FILE = 'eof';
+    const BEGIN = 'begin';
+    const END = 'end';
+    const SEMICOLON = 'semicolon';
 
     private static $matchers = [
         ['type' => self::NUMBER, 're' => '/^[0-9\.]+/'],
@@ -26,8 +29,11 @@ class Lexer {
         ['type' => self::WS, 're' => '/^[\s]+/'],
         ['type' => self::LEFT_PAR, 're' => '/^\(/'],
         ['type' => self::RIGHT_PAR, 're' => '/^\)/'],
+        ['type' => self::END_OF_FILE, 're' => '/^$/'],
+        ['type' => self::BEGIN, 're' => '/^begin/i'],
+        ['type' => self::END, 're' => '/^end/i'],
+        ['type' => self::SEMICOLON, 're' => '/^;/'],
         ['type' => self::IDENTIFIER, 're' => '/^[_a-zA-Z][_a-zA-Z0-9]*/'],
-        ['type' => self::END_OF_FILE, 're' => '/^$/']
     ];
 
     private $input;
