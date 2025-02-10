@@ -32,7 +32,8 @@ $tests = [
     ['expression' => '2+2; end;', 'expected' => null],
 ];
 
-// TODO L_11 вынести тесты отдельно и накатить ещё тестов
+// TODO L_3 вынести тесты отдельно и накатить ещё тестов
+// TODO L_4 дописать оставшиеся expressions, которые разбирали на пере(лучше разбить на несколько задач
 
 foreach ($tests as $test) {
     $expression = $test['expression'];
