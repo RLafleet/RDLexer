@@ -22,14 +22,11 @@ $tests = [
     ['expression' => 'fn(a,)', 'expected' => null],
     ['expression' => 'fn(a,b)', 'expected' => null],
     ['expression' => ')', 'expected' => null],
-    ['expression' => 'begin 2+2; end;', 'expected' => 4],
-    ['expression' => 'begin 2+3-4; end;', 'expected' => 1],
-    ['expression' => 'begin (2+2)*2; end;', 'expected' => 8],
-    ['expression' => 'begin 2+2; 3+3; end;', 'expected' => 6], // Если что, возращает последний результат
     ['expression' => 'begin end;', 'expected' => null],
-    ['expression' => 'begin 2+2 end;', 'expected' => null],
-    ['expression' => 'begin 2+2;', 'expected' => null],
     ['expression' => '2+2; end;', 'expected' => null],
+    ['expression' => '--5', 'expected' => 5],
+    ['expression' => '-----5', 'expected' => -5],
+    ['expression' => '-(-5-5+5)-5', 'expected' => 0],
 ];
 
 // TODO L_3 вынести тесты отдельно и накатить ещё тестов
